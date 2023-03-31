@@ -1,14 +1,12 @@
 package Movies;
+
 import java.util.*;
 
-public abstract class Movie { 
+public abstract class Movie {
     protected String Title;
     protected String Director;
-    protected int ReleaseDate;
-    
-    protected List<Review> UserReview = new LinkedList<Review>() {
-        
-    };
+    protected int ReleaseYear;
+    protected List<Review> UserReviews;
 
     public class Review {
         private String Comment;
@@ -28,9 +26,5 @@ public abstract class Movie {
         }
 
     }
-
-
-
-
 
 }
