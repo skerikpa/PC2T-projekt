@@ -2,11 +2,26 @@ package Movies;
 
 import java.util.LinkedList;
 import java.util.List;
-import MovieExceptions.*;
 
 public class AnimatedMovie extends Movie {
     private List<String> AnimatorList;
     private int RecommendedAge;
+
+    public List<String> getAnimatorList() {
+        return AnimatorList;
+    }
+
+    public void setAnimatorList(List<String> animatorList) {
+        AnimatorList = animatorList;
+    }
+
+    public int getRecommendedAge() {
+        return RecommendedAge;
+    }
+
+    public void setRecommendedAge(int recommendedAge) {
+        RecommendedAge = recommendedAge;
+    }
 
     public AnimatedMovie(String title, String director, int yearofrelease, int agerecomended,
             List<String> listOfAnimators) {

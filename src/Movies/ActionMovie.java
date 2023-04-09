@@ -1,18 +1,32 @@
 package Movies;
 
-import MovieExceptions.*;
-
 import java.util.LinkedList;
 import java.util.List;
 
 public class ActionMovie extends Movie {
     private List<String> ActorList;
 
+    public List<String> getActorList() {
+        return ActorList;
+    }
+
+    public void setActorList(List<String> actorList) {
+        ActorList = actorList;
+    }
+
     public ActionMovie(String title, String director, int yearofrelease) {
         Title = title;
         Director = director;
         ReleaseYear = yearofrelease;
         UserReviews = new LinkedList<Review>();
+        ActorList = new LinkedList<String>();
+    }
+    public ActionMovie(String title, String director, int yearofrelease, List<String> listofactors) {
+        Title = title;
+        Director = director;
+        ReleaseYear = yearofrelease;
+        UserReviews = new LinkedList<Review>();
+        ActorList = listofactors;
     }
 
     public void Rate(String stars) throws RatingIsOutOfBoundException, RatingBadFormatException {

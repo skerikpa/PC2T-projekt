@@ -1,4 +1,4 @@
-package MovieExceptions;
+package Movies;
 
 public class RatingBadFormatException extends Exception {
     public RatingBadFormatException(String Msg){
