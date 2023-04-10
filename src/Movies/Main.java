@@ -7,10 +7,12 @@ import java.util.Scanner;
 
 public class Main {
 
+	static DatabaseOfMovies dbm = new DatabaseOfMovies();
+
 	public static void main(String[] args) throws IOException {
-		DatabaseOfMovies dbm = new DatabaseOfMovies();
+		
 		Scanner MenuInput = new Scanner(System.in);
-		Scanner LocalInput;
+		//Scanner LocalInput;
 
 		loop: while (true) {
 			System.out.println("--Movies--");
@@ -30,51 +32,13 @@ public class Main {
 
 			switch (userSelection) {
 				case 1:
-					LocalInput = new Scanner(System.in);
-					System.out.println("--Add new movie--");
-					System.out.println("Select Option: 1. Action Movie; | 2. Animated Movie;");
-					var typeOption = LocalInput.nextInt();
-
-					LocalInput = new Scanner(System.in);
-
-					System.out.println("Input info in this format: <title> <director> <year of release>:");
-					var _title = LocalInput.next();
-					var _director = LocalInput.next();
-					var _releaseYear = LocalInput.nextInt();
-
-					switch (typeOption) {
-						case 1:
-							System.out.println("Add actors (leave empty to finish)");
-							List<String> _actorList = new LinkedList<String>();
-							String actor;
-							LocalInput = new Scanner(System.in);
-							while (!(actor = LocalInput.nextLine()).isEmpty())
-								_actorList.add(actor);
-
-							dbm.AddActionMovie(_title, _director, _releaseYear, _actorList);
-							break;
-						case 2:
-							System.out.println("Input recommended age: ");
-							LocalInput = new Scanner(System.in);
-							var _age = LocalInput.nextInt();
-
-							List<String> _AnimatorList = new LinkedList<String>();
-							String Animator;
-							System.out.println("Add animators (leave empty to finish)");
-							LocalInput = new Scanner(System.in);
-							while (!(Animator = LocalInput.nextLine()).isEmpty())
-								_AnimatorList.add(Animator);
-
-							dbm.AddAnimatedMovie(_title, _director, _releaseYear, _age, _AnimatorList);
-							break;
-
-						default:
-							break;
-					}
-
+					AddNewMovie();
+					System.in.read();
 					break;
 
 				case 2:
+					EditMovie();
+					System.in.read();
 					break;
 				case 3:
 					break;
@@ -91,4 +55,60 @@ public class Main {
 			}
 		}
 	}
+
+	private static void AddNewMovie() {
+		Scanner LocalInput = new Scanner(System.in);
+		System.out.println("--Add new movie--");
+		System.out.println("Select Option: 1. Action Movie; | 2. Animated Movie;");
+		var typeOption = LocalInput.nextInt();
+
+		LocalInput = new Scanner(System.in);
+
+		System.out.println("Input info in this format: <title> <director> <year of release>:");
+		var _title = LocalInput.next();
+		var _director = LocalInput.next();
+		var _releaseYear = LocalInput.nextInt();
+
+		switch (typeOption) {
+			case 1:
+				System.out.println("Add actors (leave empty to finish)");
+				List<String> _actorList = new LinkedList<String>();
+				String actor;
+				LocalInput = new Scanner(System.in);
+				while (!(actor = LocalInput.nextLine()).isEmpty())
+					_actorList.add(actor);
+
+				dbm.AddActionMovie(_title, _director, _releaseYear, _actorList);
+				break;
+			case 2:
+				System.out.println("Input recommended age: ");
+				LocalInput = new Scanner(System.in);
+				var _age = LocalInput.nextInt();
+
+				List<String> _AnimatorList = new LinkedList<String>();
+				String Animator;
+				System.out.println("Add animators (leave empty to finish)");
+				LocalInput = new Scanner(System.in);
+				while (!(Animator = LocalInput.nextLine()).isEmpty())
+					_AnimatorList.add(Animator);
+
+				dbm.AddAnimatedMovie(_title, _director, _releaseYear, _age, _AnimatorList);
+				
+				break;
+
+			default:
+				break;			
+		}
+		System.out.println("Added \"" + _title + "\"");
+
+	}
+
+	private static void EditMovie() {	//need to finish this :/
+		Scanner LocalInput = new Scanner(System.in);
+		System.out.println("--Add new movie (currently movie finder)--");
+		System.out.println("Write movie to find: ");
+		var key = LocalInput.nextLine();		
+		dbm.ShowMovieDescription(key);
+	}
+
 }

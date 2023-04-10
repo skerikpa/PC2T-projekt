@@ -27,14 +27,37 @@ public class DatabaseOfMovies {
         }
     }
 
-    public Movie FindMovie(String title){
+    private Movie FindMovie(String title){
         for (Movie movie : ListOfMovies) {
-            if (movie.getTitle() == title) {
-                return movie;
-            }
+            if (movie.getTitle().equals(title)) return movie;
         }
         return null;
     }
 
+    public void ShowMovieDescription(String title){
+        System.out.println("Searching \"" + title + "\"");
+        var movie = FindMovie(title);
+        if (movie != null) {
+            System.out.println("Title: " + movie.getTitle() + 
+            "\nType: " + (movie instanceof ActionMovie ? "Action Movie" : "Animated Movie") +
+            "\nDirector: " + movie.getDirector() +
+            "\nYear of release: " + movie.getReleaseYear() +
+            (movie instanceof AnimatedMovie ? "\nRating(Age): +" + ((AnimatedMovie)movie).getRecommendedAge() : ""));
+            if (movie instanceof ActionMovie) {
+                System.out.println("List of actors:");
+                for (String person : ((ActionMovie)movie).getActorList()) {
+                    System.out.println(person);
+                }
+            }
+            else{
+                System.out.println("List of animators:");
+                for (String person : ((AnimatedMovie)movie).getAnimatorList()) {
+                    System.out.println(person);
+                }
+            }
+
+        }
+        else System.out.println("No such movie was found in database!");
+    }
 
 }
