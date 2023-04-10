@@ -27,4 +27,14 @@ public class DatabaseOfMovies {
         }
     }
 
+    public Movie FindMovie(String title){
+        for (Movie movie : ListOfMovies) {
+            if (movie.getTitle() == title) {
+                return movie;
+            }
+        }
+        return null;
+    }
+
+
 }
