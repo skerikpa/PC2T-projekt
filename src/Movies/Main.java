@@ -49,6 +49,7 @@ public class Main {
 					System.in.read();
 					break;
 				case 11:
+					MenuInput.close();
 					break loop;
 				default:
 					break;
@@ -59,15 +60,26 @@ public class Main {
 	private static void AddNewMovie() {
 		Scanner LocalInput = new Scanner(System.in);
 		System.out.println("--Add new movie--");
-		System.out.println("Select Option: 1. Action Movie; | 2. Animated Movie;");
-		var typeOption = LocalInput.nextInt();
 
-		LocalInput = new Scanner(System.in);
+		while (true) {
+			System.out.println("Select Option: 1. Action Movie; | 2. Animated Movie;");
+			if (LocalInput.hasNextInt())
+				break;
+			LocalInput.next();
+		}
+		int typeOption = LocalInput.nextInt();
 
-		System.out.println("Input info in this format: <title> <director> <year of release>:");
+		System.out.println("Input info in this format: <title> <director>:");
 		var _title = LocalInput.next();
 		var _director = LocalInput.next();
-		var _releaseYear = LocalInput.nextInt();
+
+		while (true) {
+			System.out.println("Input year of release:");
+			if (LocalInput.hasNextInt())
+				break;
+			LocalInput.next();
+		}
+		int _releaseYear = LocalInput.nextInt();
 
 		switch (typeOption) {
 			case 1:
@@ -81,9 +93,13 @@ public class Main {
 				dbm.AddActionMovie(_title, _director, _releaseYear, _actorList);
 				break;
 			case 2:
-				System.out.println("Input recommended age: ");
-				LocalInput = new Scanner(System.in);
-				var _age = LocalInput.nextInt();
+				while (true) {
+					System.out.println("Input recommended age: ");
+					if (LocalInput.hasNextInt())
+						break;
+					LocalInput.next();
+				}
+				int _age = LocalInput.nextInt();
 
 				List<String> _AnimatorList = new LinkedList<String>();
 				String Animator;
@@ -100,7 +116,6 @@ public class Main {
 				break;
 		}
 		System.out.println("Added \"" + _title + "\"");
-
 	}
 
 	private static void EditMovie() { // need to finish this :/
@@ -109,6 +124,7 @@ public class Main {
 		System.out.println("Write movie to find: ");
 		var key = LocalInput.nextLine();
 		dbm.ShowMovieDescription(key);
+		LocalInput.close();
 	}
 
 }
