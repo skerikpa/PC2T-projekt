@@ -10,9 +10,9 @@ public class Main {
 	static DatabaseOfMovies dbm = new DatabaseOfMovies();
 
 	public static void main(String[] args) throws IOException {
-		
+
 		Scanner MenuInput = new Scanner(System.in);
-		//Scanner LocalInput;
+		// Scanner LocalInput;
 
 		loop: while (true) {
 			System.out.println("--Movies--");
@@ -93,21 +93,21 @@ public class Main {
 					_AnimatorList.add(Animator);
 
 				dbm.AddAnimatedMovie(_title, _director, _releaseYear, _age, _AnimatorList);
-				
+
 				break;
 
 			default:
-				break;			
+				break;
 		}
 		System.out.println("Added \"" + _title + "\"");
 
 	}
 
-	private static void EditMovie() {	//need to finish this :/
+	private static void EditMovie() { // need to finish this :/
 		Scanner LocalInput = new Scanner(System.in);
 		System.out.println("--Add new movie (currently movie finder)--");
 		System.out.println("Write movie to find: ");
-		var key = LocalInput.nextLine();		
+		var key = LocalInput.nextLine();
 		dbm.ShowMovieDescription(key);
 	}
 
