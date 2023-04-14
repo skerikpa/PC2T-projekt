@@ -57,6 +57,8 @@ public abstract class Movie {
     }
 
 
+    public abstract void Rate(String stars, String comment) throws RatingIsOutOfBoundException, RatingBadFormatException;
+    public abstract void Rate(int stars, String comment) throws RatingIsOutOfBoundException, RatingBadFormatException;
 
     public class Review {
         private String Comment;

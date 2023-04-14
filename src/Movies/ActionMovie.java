@@ -29,18 +29,8 @@ public class ActionMovie extends Movie {
         ActorList = listofactors;
     }
 
-    public void Rate(String stars) throws RatingIsOutOfBoundException, RatingBadFormatException {
-        var cnt = 0;
-        for (char i : stars.toCharArray()) {
-            if (i != '*')
-                throw new RatingBadFormatException("Wrong Symbol in a String! (Only '*' allowed!)");
-            if (cnt > 5)
-                throw new RatingIsOutOfBoundException("Stars out of bounds! (Allowed 1* - 5*)");
-            cnt++;
-        }
-        UserReviews.add(new Review(cnt, ""));
-    }
-
+    
+    @Override
     public void Rate(String stars, String comment) throws RatingIsOutOfBoundException, RatingBadFormatException {
         var cnt = 0;
         for (char i : stars.toCharArray()) {
@@ -51,5 +41,10 @@ public class ActionMovie extends Movie {
             cnt++;
         }
         UserReviews.add(new Review(cnt, comment));
+    }
+
+    @Override
+    public void Rate(int stars, String comment) throws RatingBadFormatException {
+        throw new RatingBadFormatException("Wrong Symbol in a String! (Only '*' allowed!)");
     }
 }

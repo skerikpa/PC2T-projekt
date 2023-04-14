@@ -33,13 +33,13 @@ public class AnimatedMovie extends Movie {
         UserReviews = new LinkedList<Review>();
     }
 
-    public void Rate(int stars) throws RatingIsOutOfBoundException {
-        if (stars < 1 || stars > 10)
-            throw new RatingIsOutOfBoundException("Stars out of bounds! (Allowed 1* - 10*)");
-        UserReviews.add(new Review(stars, ""));
+    @Override
+    public void Rate(String stars, String comment) throws RatingBadFormatException{
+        throw new RatingBadFormatException("Wrong Symbol in a String! (Only number allowed!)");
     }
 
-    public void Rate(int stars, String comment) throws RatingIsOutOfBoundException {
+    @Override
+    public void Rate(int stars, String comment) throws RatingIsOutOfBoundException, RatingBadFormatException {
         if (stars < 1 || stars > 10)
             throw new RatingIsOutOfBoundException("Stars out of bounds! (Allowed 1* - 10*)");
         UserReviews.add(new Review(stars, comment));

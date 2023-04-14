@@ -42,7 +42,7 @@ public class DatabaseOfMovies {
         System.out.println(fmt);
     }
 
-    private Movie FindMovie(String title) {
+    public Movie FindMovie(String title) {
         for (Movie movie : ListOfMovies) {
             if (movie.getTitle().equals(title))
                 return movie;
@@ -74,6 +74,76 @@ public class DatabaseOfMovies {
 
         } else
             System.out.println("No such movie was found in database!");
+    }
+
+    public void DeleteMovieFromDB(String title){
+        //ShowMovieDescription(title);
+        System.out.println(ListOfMovies.remove(FindMovie(title)) ? "Deleted!" : "No such movie was found in database!");
+    }
+
+    public void RateMovie(String title){
+        System.out.println("Searching \"" + title + "\"");
+        var movie = FindMovie(title);
+        if (movie != null) {
+            
+
+
+        } 
+        else System.out.println("No such movie was found in database!");
+    }
+
+    public void EditMovie(String mov, int op, String value){
+        var movie = FindMovie(mov);
+        if (movie == null)
+            return;
+
+        switch (op) {
+            case 1:
+                movie.setTitle(value);
+                break;
+            case 2:
+                movie.setDirector(value);
+                break;
+            case 3:
+                movie.setReleaseYear(Integer.parseInt(value));
+                break;
+            case 5:
+                if (movie instanceof AnimatedMovie) ((AnimatedMovie)movie).setRecommendedAge(Integer.parseInt(value));
+            break;
+            default:
+                break;
+        }
+    }
+
+    public void EditMovieWorkers(String mov, List<String> workers){
+        var movie = FindMovie(mov);
+        if (movie == null)
+            return;
+        if (movie instanceof ActionMovie) ((ActionMovie)movie).setActorList(workers);
+        if (movie instanceof AnimatedMovie) ((AnimatedMovie)movie).setAnimatorList(workers);
+    }
+
+    public List<Movie> GetWorkerPortfolio(String name) {
+        List<Movie> portfolio = new LinkedList<Movie>();
+        for (Movie movie : ListOfMovies) {
+            if (movie instanceof ActionMovie && ((ActionMovie) movie).getActorList().contains(name)
+                    || movie instanceof AnimatedMovie && ((AnimatedMovie) movie).getAnimatorList().contains(name))
+                portfolio.add(movie);
+        }
+        return (portfolio.isEmpty() ? null : portfolio);
+    }
+
+    public void ListWorkerHistory(String name){
+        var history = GetWorkerPortfolio(name);
+        if(history != null){
+            System.out.println(name + " participated ");
+            for (Movie movie : history) {
+                System.out.println((movie instanceof ActionMovie ? "as actor in \"" : "as animator in \"") + movie.getTitle() + "\";");
+            }
+        }
+        else{
+            System.out.println("No such person was found in Database!");
+        }
     }
 
 }
