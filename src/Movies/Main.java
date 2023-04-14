@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
+
 public class Main {
 
 	static DatabaseOfMovies dbm = new DatabaseOfMovies();
@@ -54,6 +55,10 @@ public class Main {
 					break;
 				case 6:
 					FindMovie();
+					System.in.read();
+					break;
+				case 7:
+					ListWorkersThatWorkedOnMoreThanOneAnimatedOrActionMovies();
 					System.in.read();
 					break;
 				case 8:
@@ -131,6 +136,7 @@ public class Main {
 	}
 
 	private static void EditMovie() { // need to finish this :/
+
 		Scanner LocalInput = new Scanner(System.in);
 		System.out.println("--Edit movie (currently movie finder)--");
 		System.out.println("Write movie to find: ");
@@ -216,5 +222,9 @@ public class Main {
 		System.out.println("Write name of a person: ");
 		var key = LocalInput.nextLine();
 		dbm.ListWorkerHistory(key);
+	}
+
+	private static void ListWorkersThatWorkedOnMoreThanOneAnimatedOrActionMovies(){
+		dbm.BruteForceTheProcessor();
 	}
 }

@@ -146,4 +146,28 @@ public class DatabaseOfMovies {
         }
     }
 
+    public void BruteForceTheProcessor(){
+        List<String> uniqueWorkers = new LinkedList<String>();
+        for (Movie movie : ListOfMovies) {
+            if (movie instanceof ActionMovie) {
+                for (String worker : ((ActionMovie)movie).getActorList()) {
+                    if (!(uniqueWorkers.contains(worker))) uniqueWorkers.add(worker);
+                }
+            }
+            else{
+                for (String worker : ((AnimatedMovie)movie).getAnimatorList()) {
+                    if (!(uniqueWorkers.contains(worker))) uniqueWorkers.add(worker);
+                }
+            }
+        }
+        for (String worker : uniqueWorkers) {
+
+            var anothergoddamnlist = GetWorkerPortfolio(worker);
+            if(anothergoddamnlist.size() > 1) {              
+                ListWorkerHistory(worker);  
+                System.out.println("_____________________");   
+            }      
+        }
+    }
+
 }
