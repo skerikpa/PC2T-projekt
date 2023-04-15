@@ -170,4 +170,34 @@ public class DatabaseOfMovies {
         }
     }
 
+    public String getMovieDescription(String title){
+        StringBuilder sb = new StringBuilder();
+        System.out.println("Searching \"" + title + "\"");
+        var movie = FindMovie(title);
+
+        if (movie != null) {
+            sb.append("Title: " + movie.getTitle() +
+                    "\nType: " + (movie instanceof ActionMovie ? "Action Movie" : "Animated Movie") +
+                    "\nDirector: " + movie.getDirector() +
+                    "\nYear of release: " + movie.getReleaseYear() +
+                    (movie instanceof AnimatedMovie ? "\nRating(Age): +" + ((AnimatedMovie) movie).getRecommendedAge()
+                            : ""));
+            sb.append("\n");
+            if (movie instanceof ActionMovie) {
+                sb.append("List of actors:\n");
+                for (String person : ((ActionMovie) movie).getActorList()) {
+                    sb.append(person + "\n");
+                }
+            } else {
+                sb.append("List of animators:\n");
+                for (String person : ((AnimatedMovie) movie).getAnimatorList()) {
+                    sb.append(person+"\n");
+                }
+            }
+            return sb.toString();
+        } else
+            return null;
+
+    }
+
 }

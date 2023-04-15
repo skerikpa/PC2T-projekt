@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.io.File;
+import java.io.FileWriter;
 
 
 public class Main {
@@ -18,18 +20,18 @@ public class Main {
 		loop: while (true) {
 			System.out.println("--Movies--");
 			System.out.println("1. Add new movie;");	//Done
-			System.out.println("2. Edit Movie;");		//Works, but one at a time
+			System.out.println("2. Edit Movie;");		//Works, but one parameter at a time
 			System.out.println("3. Delete Movie;");		//Done
 			System.out.println("4. Add Rating;");		//Done
 			System.out.println("5. List all movies;");	//Done
 			System.out.println("6. Find movie;");		// Description works, but RATING'N'SHITT is still WIP
-			System.out.println("7. List people involved in multiple projects;");	//wip
+			System.out.println("7. List people involved in multiple projects;");	//Done
 			System.out.println("8. List movies involving particular person;");		//Done
-			System.out.println("9. Save a movie to .txt;");		//wip
-			System.out.println("10. Load a movie from .txt;");	//wip
+			System.out.println("9. Save a movie to .txt;");		//Done
+			System.out.println("10. Load a movie from .txt;");	//Done
 			System.out.println("11. Save and Quit;");
 
-			int userSelection = MenuInput.nextInt(); // Integer.parseInt(input.nextLine());
+			int userSelection = MenuInput.nextInt();
 
 			switch (userSelection) {
 				case 1:
@@ -63,6 +65,14 @@ public class Main {
 					break;
 				case 8:
 					FindPerson();
+					System.in.read();
+					break;
+				case 9:
+					SaveMovieToFile();
+					System.in.read();
+					break;
+				case 10:
+					LoadMovieFromFile();
 					System.in.read();
 					break;
 				case 11:
@@ -227,4 +237,83 @@ public class Main {
 	private static void ListWorkersThatWorkedOnMoreThanOneAnimatedOrActionMovies(){
 		dbm.BruteForceTheProcessor();
 	}
+
+	private static void SaveMovieToFile(){
+		Scanner LocalInput = new Scanner(System.in);
+		System.out.println("--Print Movie--");
+		System.out.println("Write movie to find and print: ");
+		var key = LocalInput.nextLine();
+
+		var movie = dbm.getMovieDescription(key);
+		if(movie == null){
+			System.out.println("No such movie was found in database!");
+			return;
+		}
+
+		try (FileWriter fileWriter = new FileWriter("Movies\\"+key+".txt")) {
+			fileWriter.write(movie);
+			fileWriter.close();
+			System.out.println("Movie description has been written to "+key+".txt!");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void LoadMovieFromFile() {
+		Scanner LocalInput = new Scanner(System.in);
+		System.out.println("--Load Movie--");
+		System.out.println("Write filename (e.g. Movie.txt): ");
+		var key = LocalInput.nextLine();
+
+		File file = new File("Movies\\"+key);
+		if (!file.exists()) {
+			System.out.println("File doesnt exist :(");
+			return;
+		}
+
+		try (Scanner fileReader = new Scanner(file)) {
+			String title = new String();
+			String type = new String();
+			String director = new String();
+			String yearofrelease = new String();
+			String age = new String();
+			List<String> workers = new LinkedList<String>();
+			String data = new String();
+			while (fileReader.hasNextLine()) {
+				data = fileReader.nextLine().trim();
+				if (!data.isEmpty() && data.toLowerCase().startsWith("title"))
+					title = data.replaceFirst("Title: ", "");
+				if (!data.isEmpty() && data.toLowerCase().startsWith("type"))
+					type = data.replaceFirst("Type: ", "");
+				if (!data.isEmpty() && data.toLowerCase().startsWith("director"))
+					director = data.replaceFirst("Director: ", "");
+				if (!data.isEmpty() && data.toLowerCase().startsWith("year of release"))
+					yearofrelease = data.replaceFirst("Year of release: ", "");
+				if (!data.isEmpty() && data.toLowerCase().startsWith("rating(age)"))
+					age = data.replaceFirst("Rating(Age): ", "");
+				if (!data.isEmpty() && (data.toLowerCase().startsWith("list of animators")
+						|| data.toLowerCase().startsWith("list of actors")))
+					break;
+			}
+			if (!data.isEmpty() && (data.toLowerCase().startsWith("list of animators")
+					|| data.toLowerCase().startsWith("list of actors"))) {
+				while (fileReader.hasNextLine()) {
+					data = fileReader.nextLine().trim();
+					workers.add(data);
+				}
+			}
+
+			if (type.equals("Action Movie")) {
+				dbm.AddActionMovie(title, director, Integer.parseInt(yearofrelease), workers);
+				System.out.println("Added action movie!");
+			} else if (type.equals("Animated Movie")) {
+				dbm.AddAnimatedMovie(title, director, Integer.parseInt(yearofrelease), Integer.parseInt(age.replaceAll("[^0-9]", "")), workers);
+				System.out.println("Added animated movie!");
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+
+
 }
