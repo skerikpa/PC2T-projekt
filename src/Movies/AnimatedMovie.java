@@ -34,14 +34,14 @@ public class AnimatedMovie extends Movie {
     }
 
     @Override
-    public void Rate(String stars, String comment) throws RatingBadFormatException{
+    public void Rate(String stars, String comment) throws RatingBadFormatException {
         throw new RatingBadFormatException("Wrong Symbol in a String! (Only number allowed!)");
     }
 
     @Override
     public void Rate(int stars, String comment) throws RatingIsOutOfBoundException, RatingBadFormatException {
         if (stars < 1 || stars > 10)
-            throw new RatingIsOutOfBoundException("Stars out of bounds! (Allowed 1* - 10*)");
+            throw new RatingIsOutOfBoundException("Stars out of bounds! (Allowed 1 - 10)");
         UserReviews.add(new Review(stars, comment));
     }
 
