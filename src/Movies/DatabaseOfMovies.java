@@ -6,6 +6,7 @@ import java.util.Formatter;
 
 public class DatabaseOfMovies {
     List<Movie> ListOfMovies = new LinkedList<Movie>();
+    public static List<String> querries = new LinkedList<String>();
 
     public void AddAnimatedMovie(String title, String director, int yearofrelease, int agerecomended,
             List<String> listOfAnimators) {
@@ -19,19 +20,7 @@ public class DatabaseOfMovies {
     public void ListAllMovies() {
         Formatter fmt = new Formatter();
         fmt.format("%-20s %-20s %-20s %-20s %-20s\n", "Title", "Type", "Director", "Year Of Release", "Rating");
-        // System.out.println("Title | Type | Director | Year Of Release |
-        // Rating(Age)");
         for (Movie movie : ListOfMovies) {
-            /*
-             * System.out.println(
-             * movie.getTitle() + " | " +
-             * (movie instanceof ActionMovie ? "Action Movie" : "Animated Movie") + " | " +
-             * movie.getDirector() + " | " +
-             * movie.getReleaseYear() + " | " +
-             * (movie instanceof AnimatedMovie ? ((AnimatedMovie) movie).getRecommendedAge()
-             * : "N/A"));
-             */
-
             fmt.format("%-20s %-20s %-20s %-20s %-20s\n",
                     movie.getTitle(),
                     (movie instanceof ActionMovie ? "Action Movie" : "Animated Movie"),
@@ -76,23 +65,30 @@ public class DatabaseOfMovies {
             System.out.println("No such movie was found in database!");
     }
 
-    public void DeleteMovieFromDB(String title){
-        //ShowMovieDescription(title);
-        System.out.println(ListOfMovies.remove(FindMovie(title)) ? "Deleted!" : "No such movie was found in database!");
+    public void DeleteMovieFromDB(String title) {
+        // ShowMovieDescription(title);
+        if (ListOfMovies.remove(FindMovie(title))) {
+            System.out.println("Deleted!");
+            querries.add("DELETE FROM movies WHERE name ='" + title + "'");
+            querries.add("DELETE FROM actors WHERE title ='" + title + "'");
+            querries.add("DELETE FROM animators WHERE title ='" + title + "'");
+            querries.add("DELETE FROM anim_reviews WHERE title ='" + title + "'");
+            querries.add("DELETE FROM live_reviews WHERE title ='" + title + "'");
+        } else
+            System.out.println("Movie was not found in database");
+
     }
 
-    public void RateMovie(String title){
+    public void RateMovie(String title) {
         System.out.println("Searching \"" + title + "\"");
         var movie = FindMovie(title);
         if (movie != null) {
-            
 
-
-        } 
-        else System.out.println("No such movie was found in database!");
+        } else
+            System.out.println("No such movie was found in database!");
     }
 
-    public void EditMovie(String mov, int op, String value){
+    public void EditMovie(String mov, int op, String value) {
         var movie = FindMovie(mov);
         if (movie == null)
             return;
@@ -100,27 +96,39 @@ public class DatabaseOfMovies {
         switch (op) {
             case 1:
                 movie.setTitle(value);
+                querries.add("UPDATE movies SET name = '" + value + "' WHERE name = '" + mov + "'");
+                querries.add("UPDATE actors SET title = '" + value + "' WHERE title = '" + mov + "'");
+                querries.add("UPDATE animators SET title = '" + value + "' WHERE title = '" + mov + "'");
+                querries.add("UPDATE anim_reviews SET title = '" + value + "' WHERE title = '" + mov + "'");
+                querries.add("UPDATE live_reviews SET title = '" + value + "' WHERE title = '" + mov + "'");
+
                 break;
             case 2:
                 movie.setDirector(value);
+                querries.add("UPDATE movies SET director = '" + value + "' WHERE name = '" + mov + "'");
                 break;
             case 3:
                 movie.setReleaseYear(Integer.parseInt(value));
+                querries.add("UPDATE movies SET release_year = " + value + " WHERE name = '" + mov + "'");
                 break;
             case 5:
-                if (movie instanceof AnimatedMovie) ((AnimatedMovie)movie).setRecommendedAge(Integer.parseInt(value));
-            break;
+                if (movie instanceof AnimatedMovie)
+                    ((AnimatedMovie) movie).setRecommendedAge(Integer.parseInt(value));
+                querries.add("UPDATE movies SET age_rating = " + value + " WHERE name = '" + mov + "'");
+                break;
             default:
                 break;
         }
     }
 
-    public void EditMovieWorkers(String mov, List<String> workers){
+    public void EditMovieWorkers(String mov, List<String> workers) {
         var movie = FindMovie(mov);
         if (movie == null)
             return;
-        if (movie instanceof ActionMovie) ((ActionMovie)movie).setActorList(workers);
-        if (movie instanceof AnimatedMovie) ((AnimatedMovie)movie).setAnimatorList(workers);
+        if (movie instanceof ActionMovie)
+            ((ActionMovie) movie).setActorList(workers);
+        if (movie instanceof AnimatedMovie)
+            ((AnimatedMovie) movie).setAnimatorList(workers);
     }
 
     public List<Movie> GetWorkerPortfolio(String name) {
@@ -133,44 +141,45 @@ public class DatabaseOfMovies {
         return (portfolio.isEmpty() ? null : portfolio);
     }
 
-    public void ListWorkerHistory(String name){
+    public void ListWorkerHistory(String name) {
         var history = GetWorkerPortfolio(name);
-        if(history != null){
+        if (history != null) {
             System.out.println(name + " participated ");
             for (Movie movie : history) {
-                System.out.println((movie instanceof ActionMovie ? "as actor in \"" : "as animator in \"") + movie.getTitle() + "\";");
+                System.out.println((movie instanceof ActionMovie ? "as actor in \"" : "as animator in \"")
+                        + movie.getTitle() + "\";");
             }
-        }
-        else{
+        } else {
             System.out.println("No such person was found in Database!");
         }
     }
 
-    public void BruteForceTheProcessor(){
+    public void BruteForceTheProcessor() {
         List<String> uniqueWorkers = new LinkedList<String>();
         for (Movie movie : ListOfMovies) {
             if (movie instanceof ActionMovie) {
-                for (String worker : ((ActionMovie)movie).getActorList()) {
-                    if (!(uniqueWorkers.contains(worker))) uniqueWorkers.add(worker);
+                for (String worker : ((ActionMovie) movie).getActorList()) {
+                    if (!(uniqueWorkers.contains(worker)))
+                        uniqueWorkers.add(worker);
                 }
-            }
-            else{
-                for (String worker : ((AnimatedMovie)movie).getAnimatorList()) {
-                    if (!(uniqueWorkers.contains(worker))) uniqueWorkers.add(worker);
+            } else {
+                for (String worker : ((AnimatedMovie) movie).getAnimatorList()) {
+                    if (!(uniqueWorkers.contains(worker)))
+                        uniqueWorkers.add(worker);
                 }
             }
         }
         for (String worker : uniqueWorkers) {
 
             var anothergoddamnlist = GetWorkerPortfolio(worker);
-            if(anothergoddamnlist.size() > 1) {              
-                ListWorkerHistory(worker);  
-                System.out.println("_____________________");   
-            }      
+            if (anothergoddamnlist.size() > 1) {
+                ListWorkerHistory(worker);
+                System.out.println("_____________________");
+            }
         }
     }
 
-    public String getMovieDescription(String title){
+    public String getMovieDescription(String title) {
         StringBuilder sb = new StringBuilder();
         System.out.println("Searching \"" + title + "\"");
         var movie = FindMovie(title);
@@ -191,7 +200,7 @@ public class DatabaseOfMovies {
             } else {
                 sb.append("List of animators:\n");
                 for (String person : ((AnimatedMovie) movie).getAnimatorList()) {
-                    sb.append(person+"\n");
+                    sb.append(person + "\n");
                 }
             }
             return sb.toString();

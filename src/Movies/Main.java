@@ -16,7 +16,7 @@ public class Main {
 
 	static DatabaseOfMovies dbm = new DatabaseOfMovies();
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, RatingIsOutOfBoundException, RatingBadFormatException {
 
 		Scanner MenuInput = new Scanner(System.in);
 		// Scanner LocalInput;
@@ -82,6 +82,7 @@ public class Main {
 					break;
 				case 11:
 					MenuInput.close();
+					SaveMoviesToDB();
 					break loop;
 				default:
 					break;
@@ -119,10 +120,15 @@ public class Main {
 				List<String> _actorList = new LinkedList<String>();
 				String actor;
 				LocalInput = new Scanner(System.in);
-				while (!(actor = LocalInput.nextLine()).isEmpty())
+				while (!(actor = LocalInput.nextLine()).isEmpty()) {
 					_actorList.add(actor);
-
+					DatabaseOfMovies.querries.add("INSERT INTO actors VALUES ('" + _title + "', '" + actor + "')");
+				}
 				dbm.AddActionMovie(_title, _director, _releaseYear, _actorList);
+
+				DatabaseOfMovies.querries.add("INSERT INTO movies VALUES (\'" + _title + "\', 'Action Movie',\'"
+						+ _director + "\'," + Integer.toString(_releaseYear) + ", null)");
+
 				break;
 			case 2:
 				while (true) {
@@ -137,13 +143,17 @@ public class Main {
 				String Animator;
 				System.out.println("Add animators (leave empty to finish)");
 				LocalInput = new Scanner(System.in);
-				while (!(Animator = LocalInput.nextLine()).isEmpty())
+				while (!(Animator = LocalInput.nextLine()).isEmpty()) {
 					_AnimatorList.add(Animator);
-
+					DatabaseOfMovies.querries
+							.add("INSERT INTO animators VALUES (\'" + _title + "\', \'" + Animator + "\')");
+				}
 				dbm.AddAnimatedMovie(_title, _director, _releaseYear, _age, _AnimatorList);
 
-				break;
+				DatabaseOfMovies.querries.add("INSERT INTO movies VALUES (\'" + _title + "\', 'Animated Movie',\'"
+						+ _director + "\'," + _releaseYear + ", " + _age + ")");
 
+				break;
 			default:
 				break;
 		}
@@ -170,8 +180,18 @@ public class Main {
 				List<String> _actorList = new LinkedList<String>();
 				String actor;
 				LocalInput = new Scanner(System.in);
-				while (!(actor = LocalInput.nextLine()).isEmpty())
+
+				DatabaseOfMovies.querries
+						.add(mov instanceof ActionMovie ? "DELETE FROM actors WHERE title ='" + key + "'"
+								: "DELETE FROM animators WHERE title ='" + key + "'");
+				while (!(actor = LocalInput.nextLine()).isEmpty()) {
 					_actorList.add(actor);
+					if (mov instanceof ActionMovie) {
+						DatabaseOfMovies.querries.add("INSERT INTO actors VALUES ('" + key + "','" + actor + "')");
+					} else {
+						DatabaseOfMovies.querries.add("INSERT INTO animators VALUES ('" + key + "','" + actor + "')");
+					}
+				}
 				dbm.EditMovieWorkers(key, _actorList);
 			}
 		} else
@@ -189,7 +209,7 @@ public class Main {
 
 	private static void RateMovie() {
 		Scanner LocalInput = new Scanner(System.in);
-		System.out.println("--Delete movie--");
+		System.out.println("--Add rating--");
 		System.out.println("Write movie to find and rate: ");
 		var key = LocalInput.nextLine();
 		var mov = dbm.FindMovie(key);
@@ -202,6 +222,15 @@ public class Main {
 				var comment = LocalInput.nextLine();
 				try {
 					mov.Rate(score, comment);
+
+					int countStars = 0;
+					for (int i = 0; i < score.length(); i++) {
+						if (score.charAt(i) == '*') {
+							countStars++;
+						}
+					}
+					DatabaseOfMovies.querries.add("INSERT INTO live_reviews VALUES ('" + key + "',"
+							+ Integer.toString(countStars) + ",'" + comment + "')");
 				} catch (RatingIsOutOfBoundException | RatingBadFormatException e) {
 					e.printStackTrace();
 				}
@@ -213,6 +242,8 @@ public class Main {
 				var comment = LocalInput.nextLine();
 				try {
 					mov.Rate(score, comment);
+					DatabaseOfMovies.querries.add("INSERT INTO anim_reviews VALUES ('" + key + "',"
+							+ Integer.toString(score) + ",'" + comment + "')");
 				} catch (RatingIsOutOfBoundException | RatingBadFormatException e) {
 					e.printStackTrace();
 				}
@@ -304,15 +335,24 @@ public class Main {
 				while (fileReader.hasNextLine()) {
 					data = fileReader.nextLine().trim();
 					workers.add(data);
+					if (type.equals("Action Movie")) {
+						DatabaseOfMovies.querries.add("INSERT INTO actors VALUES('" + title + "', '" + data + "')");
+					} else {
+						DatabaseOfMovies.querries.add("INSERT INTO animators VALUES('" + title + "', '" + data + "')");
+					}
 				}
 			}
 
 			if (type.equals("Action Movie")) {
 				dbm.AddActionMovie(title, director, Integer.parseInt(yearofrelease), workers);
+				DatabaseOfMovies.querries.add("INSERT INTO movies VALUES('" + title + "', '" + type + "', '" + director
+						+ "'," + yearofrelease + ", null)");
 				System.out.println("Added action movie!");
 			} else if (type.equals("Animated Movie")) {
 				dbm.AddAnimatedMovie(title, director, Integer.parseInt(yearofrelease),
 						Integer.parseInt(age.replaceAll("[^0-9]", "")), workers);
+				DatabaseOfMovies.querries.add("INSERT INTO movies VALUES('" + title + "', '" + type + "', '" + director
+						+ "'," + yearofrelease + ", " + age.replaceAll("[^0-9]", "") + ")");
 				System.out.println("Added animated movie!");
 			}
 		} catch (Exception e) {
@@ -320,7 +360,7 @@ public class Main {
 		}
 	}
 
-	private static void LoadMoviesFromDB() {
+	private static void LoadMoviesFromDB() throws RatingIsOutOfBoundException, RatingBadFormatException {
 		File dbfile = new File(".");
 		String jdbcUrl = "jdbc:sqlite:" + dbfile.getAbsolutePath() + "\\moviesdb.db";
 		try (Connection connection = DriverManager.getConnection(jdbcUrl);) {
@@ -346,6 +386,18 @@ public class Main {
 						workers.add(result_context.getString("actor"));
 					}
 					dbm.AddActionMovie(title, director, releaseYear, workers);
+
+					Statement stmnt_score = connection.createStatement();
+					ResultSet result_score = stmnt_score
+							.executeQuery("Select * FROM live_reviews WHERE title = \'" + title + "\'");
+
+					while (result_score.next()) {
+						String starsToString = "";
+						for (int i = 1; i <= result_score.getInt("stars"); i++) {
+							starsToString += "*";
+						}
+						dbm.FindMovie(title).Rate(starsToString, result_score.getString("comment"));
+					}
 				} else if (type.equals("Animated Movie")) {
 					// var sql_context = "SELECT * FROM actors WHERE title = \'" + title + "\'";
 					Statement stmnt_context = connection.createStatement();
@@ -357,7 +409,16 @@ public class Main {
 					}
 
 					dbm.AddAnimatedMovie(title, director, releaseYear, age, workers);
+
+					Statement stmnt_score = connection.createStatement();
+					ResultSet result_score = stmnt_score
+							.executeQuery("Select * FROM anim_reviews WHERE title = \'" + title + "\'");
+
+					while (result_score.next()) {
+						dbm.FindMovie(title).Rate(result_score.getInt("score"), result_score.getString("comment"));
+					}
 				}
+
 			}
 
 			connection.close();
@@ -366,5 +427,20 @@ public class Main {
 			e.printStackTrace();
 		}
 
+	}
+
+	private static void SaveMoviesToDB() {
+		File dbfile = new File(".");
+		String jdbcUrl = "jdbc:sqlite:" + dbfile.getAbsolutePath() + "\\moviesdb.db";
+		try (Connection connection = DriverManager.getConnection(jdbcUrl);) {
+			for (String querry : DatabaseOfMovies.querries) {
+				Statement stmnt = connection.createStatement();
+				stmnt.executeUpdate(querry);
+			}
+			connection.close();
+		} catch (SQLException e) {
+			System.out.println("ERROR connecting to db");
+			e.printStackTrace();
+		}
 	}
 }
